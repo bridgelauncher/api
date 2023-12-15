@@ -1,0 +1,12 @@
+{
+    "name": "bridge-launcher-api",
+    "description": "Types for the Bridge Launcher API.",
+    "authors": "Tored",
+    "version": "0.0.1",
+    "license": "MIT",
+    "bugs": { 
+        "url": "https://github.com/theothertored/bridgelauncherapi"
+    },
+    "homepage": "https://github.com/theothertored/bridgelauncher",
+    "dependencies": {}
+}
