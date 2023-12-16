@@ -18,3 +18,9 @@ npm i @bridgelauncher/api
 ### Directly
 
 Download the `Bridge.d.ts` file into the root of your project.
+
+## Links
+
+- [Bridge Launcher project home](https://github.com/bridgelauncher)
+- [Launcher](https://github.com/bridgelauncher/launcher)
+- [API mock for development](https://github.com/bridgelauncher/api)
