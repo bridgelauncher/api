@@ -78,7 +78,7 @@ export interface WindowInsets
     top: number;
     right: number;
     bottom: number;
-};
+}
 
 /**
  * Describes the object Bridge injects into the WebView to allow the project to use Android functionalities.  
@@ -139,21 +139,21 @@ export interface JSToBridgeAPI
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestAppUninstall(packageName: string, showToastIfFailed: boolean = true): boolean;
+    requestAppUninstall(packageName: string, showToastIfFailed?: boolean): boolean;
 
     /**
      * Requests the app info settings page for the app with the given package name be opened. 
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestOpenAppInfo(packageName: string, showToastIfFailed: boolean = true): boolean;
+    requestOpenAppInfo(packageName: string, showToastIfFailed?: boolean): boolean;
 
     /**
      * Requests the app with the given package name be launched. 
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestLaunchApp(packageName: string, showToastIfFailed: boolean = true): boolean;
+    requestLaunchApp(packageName: string, showToastIfFailed?: boolean): boolean;
 
 
     // wallpaper
@@ -199,14 +199,14 @@ export interface JSToBridgeAPI
      *      Bridge.sendWallpaperTap(ev.clientX, ev.clientY);
      * });
      */
-    sendWallpaperTap(x: number, y: number, z: number = 0): void;
+    sendWallpaperTap(x: number, y: number, z?: number): void;
 
     /**
      * Requests the user be prompted to select a system wallpaper.
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestChangeSystemWallpaper(showToastIfFailed: boolean = true): boolean;
+    requestChangeSystemWallpaper(showToastIfFailed?: boolean): boolean;
 
 
     // bridge button
@@ -222,7 +222,7 @@ export interface JSToBridgeAPI
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestSetBridgeButtonVisibility(newVisibility: BridgeButtonVisibility, showToastIfFailed: boolean = true): boolean;
+    requestSetBridgeButtonVisibility(newVisibility: BridgeButtonVisibility, showToastIfFailed?: boolean): boolean;
 
 
     // draw system wallpaper behind webview
@@ -238,7 +238,7 @@ export interface JSToBridgeAPI
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestSetDrawSystemWallpaperBehindWebViewEnabled(newEnabled: boolean, showToastIfFailed: boolean = true): boolean;
+    requestSetDrawSystemWallpaperBehindWebViewEnabled(newEnabled: boolean, showToastIfFailed?: boolean): boolean;
 
 
     // system theme
@@ -278,7 +278,7 @@ export interface JSToBridgeAPI
      * @see {@link BridgeEventMap.canRequestSystemNightModeChanged} to react to permission state changes.
      * @see {@link BridgeEventMap.systemNightModeChanged} to react to system night mode changes.
      */
-    requestSetSystemNightMode(mode: SystemNightMode, showToastIfFailed: boolean = true): boolean;
+    requestSetSystemNightMode(mode: SystemNightMode, showToastIfFailed?: boolean): boolean;
 
 
     // Bridge theme
@@ -294,7 +294,7 @@ export interface JSToBridgeAPI
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestSetBridgeTheme(theme: BridgeTheme, showToastIfFailed: boolean = true): boolean;
+    requestSetBridgeTheme(theme: BridgeTheme, showToastIfFailed?: boolean): boolean;
 
 
     // status bar
@@ -311,7 +311,7 @@ export interface JSToBridgeAPI
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestSetStatusBarAppearance(appearance: SystemBarAppearance, showToastIfFailed: boolean = true): boolean;
+    requestSetStatusBarAppearance(appearance: SystemBarAppearance, showToastIfFailed?: boolean): boolean;
 
 
     // navigation bar
@@ -328,7 +328,7 @@ export interface JSToBridgeAPI
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestSetNavigationBarAppearance(appearance: SystemBarAppearance, showToastIfFailed: boolean = true): boolean;
+    requestSetNavigationBarAppearance(appearance: SystemBarAppearance, showToastIfFailed?: boolean): boolean;
 
 
     // screen locking
@@ -349,7 +349,7 @@ export interface JSToBridgeAPI
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestLockScreen(showToastIfFailed: boolean = true): boolean;
+    requestLockScreen(showToastIfFailed?: boolean): boolean;
 
 
     // misc requests
@@ -359,28 +359,28 @@ export interface JSToBridgeAPI
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestOpenBridgeSettings(showToastIfFailed: boolean = true): boolean;
+    requestOpenBridgeSettings(showToastIfFailed?: boolean): boolean;
 
     /**
      * Requests the Bridge app drawer be opened.  
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestOpenBridgeAppDrawer(showToastIfFailed: boolean = true): boolean;
+    requestOpenBridgeAppDrawer(showToastIfFailed?: boolean): boolean;
 
     /**
      * Requests the developer console be opened.  
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestOpenDeveloperConsole(showToastIfFailed: boolean = true): boolean;
+    requestOpenDeveloperConsole(showToastIfFailed?: boolean): boolean;
 
     /**
      * Requests the notification shade to be expanded.  
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
      */
-    requestExpandNotificationShade(showToastIfFailed: boolean = true): boolean;
+    requestExpandNotificationShade(showToastIfFailed?: boolean): boolean;
 
 
     // toast
@@ -390,7 +390,7 @@ export interface JSToBridgeAPI
      * @param long If `true`, passes `Toast.LENGTH_LONG` as the duration. Otherwise, passes `Toast.LENGTH_SHORT`. Defaults to `false`.
      * @see [Toasts overview | Android Developers](https://developer.android.com/guide/topics/ui/notifiers/toasts)
      */
-    showToast(message: string, long: boolean = false): void;
+    showToast(message: string, long?: boolean): void;
 
 
     // window insets and cutouts

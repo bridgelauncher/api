@@ -1,10 +1,10 @@
 {
-    "name": "@theothertored/bridge-launcher-api",
+    "name": "@bridgelauncher/api",
     "description": "Types for the Bridge Launcher API.",
     "authors": "Tored",
-    "version": "0.0.2",
+    "version": "0.0.1",
     "license": "MIT",
-    "bugs": { 
+    "bugs": {
         "url": "https://github.com/theothertored/bridgelauncherapi/issue"
     },
     "homepage": "https://github.com/theothertored/bridgelauncher",
