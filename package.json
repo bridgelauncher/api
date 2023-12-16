@@ -5,12 +5,12 @@
     "version": "0.0.1",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/theothertored/bridgelauncherapi/issue"
+        "url": "https://github.com/bridgelauncher/api/issues"
     },
-    "homepage": "https://github.com/theothertored/bridgelauncher",
+    "homepage": "https://github.com/bridgelauncher",
     "repository": {
         "type": "git",
-        "url": "https://github.com/theothertored/bridgelauncherapi"
+        "url": "https://github.com/bridgelauncher/api"
     },
     "types": "Bridge.d.ts"
 }
