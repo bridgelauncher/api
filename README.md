@@ -1,15 +1,20 @@
 # Bridge Launcher API
 
-This package contains types for the Bridge Launcher API.
+Types for the Bridge Launcher API.
 
-[Bridge Launcher repository](https://github.com/theothertored/bridgelauncher)
+- [Bridge Launcher](https://github.com/bridgelauncher)
+- [Mock for development](https://github.com/bridgelauncher/api-mock)
 
 ## Install
 
 ### NPM
 
-An [NPM package](https://www.npmjs.com/package/@theothertored/bridge-launcher-api) is available:
+An [NPM package](https://www.npmjs.com/package/@bridgelauncher/api) is available:
 
 ```
-npm i @theothertored/bridge-launcher-api
+npm i @bridgelauncher/api
 ```
+
+### Directly
+
+Download the `Bridge.d.ts` file into the root of your project.
