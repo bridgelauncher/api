@@ -5,7 +5,7 @@
  */
 export interface BridgeGetAppsResponse
 {
-    apps: BridgeInstalledAppInfo;
+    apps: BridgeInstalledAppInfo[];
 }
 
 /**
@@ -24,13 +24,23 @@ export interface BridgeInstalledAppInfo
  * Values for the Bridge button visibility setting.
  * @see {@link JSToBridgeAPI.getBridgeButtonVisibility}
  * @see {@link JSToBridgeAPI.requestSetBridgeButtonVisibility}
- */
+ * @see {@link BridgeEventMap.bridgeButtonVisibilityChanged}
+*/
 export type BridgeButtonVisibility = 'shown' | 'hidden';
+
+/** 
+ * Values for the "Draw overscroll effects" Bridge setting.
+ * @see {@link JSToBridgeAPI.getOverscrollEffects}
+ * @see {@link JSToBridgeAPI.requestSetOverscrollEffects}
+ * @see {@link BridgeEventMap.overscrollEffectsChanged}
+ */
+export type OverscrollEffects = 'default' | 'none';
 
 /** 
  * Values for the Bridge theme setting.
  * @see {@link JSToBridgeAPI.getBridgeTheme}
  * @see {@link JSToBridgeAPI.requestSetBridgeTheme}
+ * @see {@link BridgeEventMap.bridgeThemeChanged}
  */
 export type BridgeTheme = 'system' | 'dark' | 'light';
 
@@ -46,20 +56,22 @@ export type BridgeTheme = 'system' | 'dark' | 'light';
 export type SystemBarAppearance = 'hide' | 'light-fg' | 'dark-fg';
 
 /**
- * Values for setting the system night mode. `custom` is only available from API level 30.
+ * Values for setting the system night mode. `custom` is only available from API level 30 (Android 11).
  * @see {@link JSToBridgeAPI.requestSetSystemNightMode}
  * @see [UiModeManager.setNightMode() | Android Developers](https://developer.android.com/reference/android/app/UiModeManager#setNightMode())
+ * @see {@link SystemNightModeOrError} for possible return values.
 */
 export type SystemNightMode = 'no' | 'yes' | 'auto' | 'custom';
 
 /**
- * Values that can be returned when getting the system night mode. `custom` is only available from API level 30.
+ * Values that can be returned when getting the system night mode. `custom` is only available from API level 30 (Android 11).
  * 
  * **NOTE:** `unknown` should never be returned, but as `-1` (`error`) is already not described by a const I've decided to err on the side of caution and include `unknown` as a possible return string. You never know with Android.
  * 
+ * @see {@link SystemNightMode}
  * @see {@link JSToBridgeAPI.getSystemNightMode}
- * @see {@link BridgeEventMap.systemNightModeChanged}
  * @see [UiModeManager.setNightMode() | Android Developers](https://developer.android.com/reference/android/app/UiModeManager#getNightMode())
+ * @see {@link BridgeEventMap.systemNightModeChanged} for requestable values.
 */
 export type SystemNightModeOrError = SystemNightMode | 'error' | 'unknown';
 
@@ -82,8 +94,10 @@ export interface WindowInsets
 
 /**
  * Describes the object Bridge injects into the WebView to allow the project to use Android functionalities.  
+ * Accessible via `window.Bridge` or simply `Bridge`.  
+ * 
  * This interface can be implemented to mock the Bridge API for development purposes.
- * @see [BridgeMock](TODO)
+ * @see [BridgeMock](https://github.com/bridgelauncher/api-mock)
  * @example
  * class BridgeMock implements JSToBridgeAPI { ... }
  * if (!window.Bridge) window.Bridge = new BridgeMock();
@@ -96,6 +110,16 @@ export interface JSToBridgeAPI
      * @see [Build.VERSION.SDK_INT | Android Developers](https://developer.android.com/reference/android/os/Build.VERSION#SDK_INT)
      */
     getAndroidAPILevel(): number;
+
+    /**
+     * Returns the current Bridge Launcher version code. This increments with every release.
+     */
+    getBridgeVersionCode(): number;
+
+    /**
+     * Returns the current Bridge Launcher version name. Should only be used for display purposes.
+     */
+    getBridgeVersionName(): string;
 
     /** 
      * Returns the last error message reported by one of the `request...()` API functions or `null` if no error happened yet.
@@ -237,9 +261,22 @@ export interface JSToBridgeAPI
      * @fires {@link BridgeEventMap.drawSystemWallpaperBehindWebViewChanged} after the setting is successfully set.
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
-     */
+    */
     requestSetDrawSystemWallpaperBehindWebViewEnabled(newEnabled: boolean, showToastIfFailed?: boolean): boolean;
 
+
+    /**
+     * Gets the current state of the "Draw overscroll effects" Bridge setting.
+     */
+    getOverscrollEffects(): OverscrollEffects;
+
+    /**
+     * Requests the "Draw overscroll effects" Bridge setting be set to the given value.
+     * @fires {@link BridgeEventMap.drawSystemWallpaperBehindWebViewChanged} after the setting is successfully set.
+     * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
+     * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
+     */
+    requestSetOverscrollEffects(effects: OverscrollEffects, showToastIfFailed?: boolean): boolean;
 
     // system theme
 
@@ -265,7 +302,7 @@ export interface JSToBridgeAPI
 
     /**
      * Requests the system's night theme be set to the given value.  
-     * The value `custom` requires API level 30.
+     * The value `custom` requires API level 30 (Android 11).
      * 
      * **WARNING!** For this to work, Bridge must be granted either `android.permission.WRITE_SECURE_SETTINGS` or `android.permission.MODIFY_DAY_NIGHT_MODE`.  
      * The former can be granted via adb, by running `adb shell pm grant com.tored.bridgelauncher android.permission.WRITE_SECURE_SETTINGS`,
@@ -335,14 +372,14 @@ export interface JSToBridgeAPI
 
     /**
      * Checks if the project can lock screen.  
-     * The user must grant Bridge device admin permissions and also allow projects to lock the screen in Bridge settings.
+     * Locking the screen requires API level 28 (Android 9). The user must enable the Bridge Accessiblity Service and also allow projects to lock the screen in Bridge settings.
      */
     getCanLockScreen(): boolean;
 
     /**
      * Requests the screen be locked.  
      * 
-     * **WARNING!** For this to work, Bridge needs device admin permissions and projects need to be allowed to lock the screen in Bridge settings.
+     * **WARNING!** Locking the screen requires API level 28 (Android 9). The user must enable the Bridge Accessiblity Service and also allow projects to lock the screen in Bridge settings.
      * Use {@link getCanLockScreen()} to check whether the requirements are fulfilled or not.
      * 
      * @fires {@link BridgeEventMap.navigationBarAppearanceChanged} after the setting is successfully set.
@@ -574,7 +611,7 @@ export interface JSToBridgeAPI
     /**
      * Returns `DisplayShape.getPath()`.
      * 
-     * **WARNING!** This call requires API level 31. Returns `null` on earlier Android versions.
+     * **WARNING!** This call requires API level 31 (Android 12). Returns `null` on earlier Android versions.
      * 
      * @returns The cutout path or `null`, if there is no cutout. Always returns `null` on API level < 31.
      * @see [DisplayCutout | Android Developers](https://developer.android.com/reference/android/view/DisplayCutout#getCutoutPath())
@@ -584,7 +621,7 @@ export interface JSToBridgeAPI
     /**
      * Returns `DisplayCutout.getCutoutPath()`.
      * 
-     * **WARNING!** This call requires API level 34. Returns `null` on earlier Android versions.
+     * **WARNING!** This call requires API level 34 (Android 14). Returns `null` on earlier Android versions.
      * 
      * @returns The display shape path or `null`, if there is no cutout. Always returns `null` on API level < 34.
      * @see [DisplayShape.getPath() | Android Developers](https://developer.android.com/reference/android/view/DisplayShape#getPath())
@@ -592,8 +629,6 @@ export interface JSToBridgeAPI
     getDisplayShapePath(): string | null;
 }
 
-/** An alias for `undefined`, or no arguments. */
-export type NoEventArgs = undefined;
 export type AppRemovedEventArgs = { packageName: string; };
 export type ValueChangeEventArgs<T> = { newValue: T; };
 
@@ -644,6 +679,11 @@ export interface BridgeEventMap
      * Called after the "Draw system wallpaper behind WebView" Bridge setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
      */
     drawSystemWallpaperBehindWebViewChanged: ValueChangeEventArgs<boolean>;
+
+    /**
+     * Called after the "Draw overscroll effects" Bridge setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
+     */
+    overscrollEffectsChanged: ValueChangeEventArgs<OverscrollEffects>;
 
     /**
      * Called from `onConfigurationChanged()` of the main Bridge activity, when the system night mode changed.
