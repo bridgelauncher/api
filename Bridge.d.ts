@@ -372,19 +372,39 @@ export interface JSToBridgeAPI
 
     /**
      * Checks if the project can lock screen.  
-     * Locking the screen requires API level 28 (Android 9). The user must enable the Bridge Accessiblity Service and also allow projects to lock the screen in Bridge settings.
+     * 
+     * Before API level 28 (Android 9) screen locking requries Bridge to be a device admin.  
+     * **WARNING!** After Bridge calls `DevicePolicyManager.lockNow()`, you won't be able to fingerprint unlock the device until you enter your PIN/password/pattern etc.  
+     * This is an unfortunate inherent limitation of this method of locking the screen.
+     * 
+     * From API level 28 (Android 9) onwards, it instead requires the Bridge Accessiblity Service be enabled.  
+     * 
+     * Regardless of API level, the user must also allow projects to lock the screen in Bridge settings.
+     * 
+     * @see [DevicePolicyManager.lockNow() | Android Developers](https://developer.android.com/reference/android/app/admin/DevicePolicyManager#lockNow())
+     * @see [AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN | Android Developers](https://developer.android.com/reference/android/accessibilityservice/AccessibilityService#GLOBAL_ACTION_LOCK_SCREEN)
      */
     getCanLockScreen(): boolean;
 
     /**
      * Requests the screen be locked.  
      * 
-     * **WARNING!** Locking the screen requires API level 28 (Android 9). The user must enable the Bridge Accessiblity Service and also allow projects to lock the screen in Bridge settings.
+     * Before API level 28 (Android 9) screen locking requries Bridge to be a device admin.  
+     * **WARNING!** After Bridge calls `DevicePolicyManager.lockNow()`, you won't be able to fingerprint unlock the device until you enter your PIN/password/pattern etc.  
+     * This is an unfortunate inherent limitation of this method of locking the screen.
+     * 
+     * From API level 28 (Android 9) onwards, it instead requires the Bridge Accessiblity Service be enabled.  
+     * 
+     * Regardless of API level, the user must also allow projects to lock the screen in Bridge settings.
+     * 
      * Use {@link getCanLockScreen()} to check whether the requirements are fulfilled or not.
      * 
      * @fires {@link BridgeEventMap.navigationBarAppearanceChanged} after the setting is successfully set.
      * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
      * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
+     * 
+     * @see [DevicePolicyManager.lockNow() | Android Developers](https://developer.android.com/reference/android/app/admin/DevicePolicyManager#lockNow())
+     * @see [AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN | Android Developers](https://developer.android.com/reference/android/accessibilityservice/AccessibilityService#GLOBAL_ACTION_LOCK_SCREEN)
      */
     requestLockScreen(showToastIfFailed?: boolean): boolean;
 
