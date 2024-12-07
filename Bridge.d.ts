@@ -1,12 +1,28 @@
+// #region SERVER RESPONSES
 
 /** 
  * Describes the JSON object returned from the Bridge API apps endpoint.
- * @see {@link JSToBridgeAPI.getAppsURL()}
+ * @see {@link JSToBridgeAPI.getAppsURL()} for the URL to `fetch()` from
  */
 export interface BridgeGetAppsResponse
 {
     apps: BridgeInstalledAppInfo[];
 }
+
+// export interface BridgeGetIconPacksResponse
+// {
+//     iconPacks: BridgeIconPackInfo[];
+// }
+
+// export interface BridgeGetIconPacksWithItemsResponse
+// {
+//     iconPacks: BridgeIconPackInfoWithItems[];
+// }
+
+// #endregion
+
+
+// #region MODELS
 
 /**
  * Describes the application info returned from Bridge APIs.
@@ -19,6 +35,22 @@ export interface BridgeInstalledAppInfo
     packageName: string;
     label: string;
 }
+
+
+// TODO: draft - uncomment after icon pack support is implemented
+// export interface BridgeIconPackInfo extends BridgeInstalledAppInfo
+// {
+//     scaleFactor: number;
+//     iconBackImgs: string[];
+//     iconMaskImg: string | null;
+//     iconUponImg: string | null;
+// }
+
+// export interface BridgeIconPackInfoWithItems extends BridgeInstalledAppInfo
+// {
+//     items: Partial<Record<string, string>>;
+// }
+
 
 /** 
  * Values for the Bridge button visibility setting.
@@ -81,7 +113,7 @@ export type SystemNightModeOrError = SystemNightMode | 'error' | 'unknown';
 export type WindowInsetsJson = string;
 
 /** 
- * Represents offsets from each edge of the screen in `dp` (equivalent to CSS `px`).
+ * Represents offsets from each edge of the screen in `dp` (should be equivalent to CSS `px`).
  * @see [WindowInsets | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets)
  */
 export interface WindowInsets
@@ -91,6 +123,11 @@ export interface WindowInsets
     right: number;
     bottom: number;
 }
+
+// #endregion
+
+
+// #region JS TO BRIDGE
 
 /**
  * Describes the object Bridge injects into the WebView to allow the project to use Android functionalities.  
@@ -146,13 +183,113 @@ export interface JSToBridgeAPI
      */
     getAppsURL(): string;
 
+
+    // icon packs
+
+    /**
+     * Creates an URL to fetch a list of installed icon packs. The response is a JSON object described by {@link BridgeGetIconPacksResponse} or {@link BridgeGetIconPacksWithItemsResponse}. 
+     * If {@param includeItems} is `true`, the response will include all items parsed from the icon pack's `appfilter.xml`. This will significantly increase the size of the response!
+     * 
+     * This function is recommended over creating the URL yourself for compatability with future versions and for easily mocking the Bridge API.
+     * 
+     * @example 
+     * fetch(Bridge.getIconPacksURL())
+     *      .then(resp => resp.json())
+     *      .then((resp: GetIconPacksResponse) => {
+     *          console.log(resp.iconPacks)
+     *      })
+     */
+    // TODO: draft - uncomment after icon pack support is implemented
+    // getIconPacksURL(includeItems?: boolean): string;
+
+    /**
+     * Creates an URL to fetch information about the icon pack with the given {@link packageName}. 
+     * The server will respond with the default icon if the icon pack is not specified or if no icon for the given app's launch intent is found in the pack.
+     * 
+     * This function is recommended over creating the URL yourself for compatability with future versions and for easily mocking the Bridge API.
+     * @example 
+     * fetch(Bridge.getIconPackInfoURL(currentIconPack.packageName))
+     *      .then(resp => resp.json())
+     *      .then((resp: GetIconPackInfoResponse) => {
+     *          console.log(resp.iconPacks)
+     *      })
+     */
+    // TODO: draft - uncomment after icon pack support is implemented
+    // getIconPackInfoURL(packageName: string, includeItems?: boolean): string;
+
+    /**
+     * Creates an URL to fetch the `appfilter.xml` for the icon pack with the given {@link packageName}.  
+     * The server will respond with 404 NotFound if no icon for the given app's launch intent is found in the pack.
+     * 
+     * This function is recommended over creating the URL yourself for compatability with future versions and for easily mocking the Bridge API.
+     * @example 
+     * fetch(Bridge.getIconPackAppFilterXMLURL(currentIconPack.packageName))
+     *      .then(resp => resp.text())
+     *      .then(appFilterXML => {
+     *          console.log(appFilterXML)
+     *      })
+     */
+    // TODO: draft - uncomment after icon pack support is implemented
+    // getIconPackAppFilterXMLURL(packageName: string): string;
+
+
+    // icons
+
     /**
      * Creates an URL to fetch the default icon for the app with the given {@link packageName}.  
+     * - The server will respond with `404 NotFound` if the app is not found.
+     * 
      * This function is recommended over creating the URL yourself for compatability with future versions and for easily mocking the Bridge API.
      * @example 
      * img.src = Bridge.getDefaultAppIconURL(app.packageName)
      */
     getDefaultAppIconURL(packageName: string): string;
+
+    /**
+     * Creates an URL to fetch an icon for the app with the given {@link appPackageName}, prioritizing the icon pack with the given {@link iconPackPackageName}.  
+     * - The server will respond with `404 NotFound` if the app is not found.  
+     * - The server will respond with the default icon if the icon pack is not specified, the pack is not found or if no icon for the given app's launch intent is found in the pack.  
+     * 
+     * This function is recommended over creating the URL yourself for compatability with future versions and for easily mocking the Bridge API.
+     * @example 
+     * img.src = Bridge.getAppIconURL(app.packageName, currentIconPack?.packageName)
+     */
+    // TODO: draft - uncomment after icon pack support is implemented
+    // getAppIconURL(appPackageName?: string, iconPackPackageName?: string): string;
+
+    /**
+     * Creates an URL to fetch an icon for the app with the given {@link appPackageName} from the icon pack with the given {@link iconPackPackageName}.  
+     * - The server will respond with `404 NotFound` if the pack is not found or if no icon for the given app's launch intent is found in the pack.
+     * 
+     * This function is recommended over creating the URL yourself for compatability with future versions and for easily mocking the Bridge API.
+     * @example 
+     * img.src = Bridge.getIconPackAppIconURL(currentIconPack.packageName, app.packageName)
+     */
+    // TODO: draft - uncomment after icon pack support is implemented
+    // getIconPackAppIconURL(iconPackPackageName: string, appPackageName: string): string;
+
+    /**
+     * Creates an URL to fetch the drawable for the item with the given {@link componentName} from the icon pack with the given {@link iconPackPackageName}.  
+     * - The server will respond with `404 NotFound` if the pack is not found or if the item or drawable are not found in the pack.
+     * 
+     * This function is recommended over creating the URL yourself for compatability with future versions and for easily mocking the Bridge API.
+     * @example 
+     * img.src = Bridge.getIconPackAppIconURL(currentIconPack.packageName, app.packageName)
+     */
+    // TODO: draft - uncomment after icon pack support is implemented
+    // getIconPackItemURL(iconPackPackageName: string, componentName: string): string;
+
+    /**
+     * Creates an URL to fetch an arbitrary drawable from the icon pack with the given {@link iconPackPackageName}.  
+     * - The server will respond with 404 NotFound if the pack is not found or if the drawable is not found in the pack.
+     * 
+     * This function is recommended over creating the URL yourself for compatability with future versions and for easily mocking the Bridge API.
+     * @example 
+     * img.src = Bridge.getIconPackAppIconURL(currentIconPack.packageName, app.packageName)
+     */
+    // TODO: draft - uncomment after icon pack support is implemented
+    // getIconPackDrawableURL(iconPackPackageName: string, drawableName: string): string;
+
 
 
     // apps
@@ -208,7 +345,10 @@ export interface JSToBridgeAPI
      *          const yMaxScroll = window.scrollHeight - window.innerHeight;
      *          const xScroll = window.scrollLeft;
      *          const yScroll = window.scrollTop;
-     *          Bridge.setWallpaperOffsets(xScroll / xMaxScroll, yScroll / yMaxScroll);
+     *          Bridge.setWallpaperOffsets(
+     *              xMaxScroll === 0 ? 0 : xScroll / xMaxScroll, 
+     *              yMaxScroll === 0 ? 0 : yScroll / yMaxScroll
+     *          );
      *      });
      * });
      */
@@ -439,6 +579,13 @@ export interface JSToBridgeAPI
      */
     requestExpandNotificationShade(showToastIfFailed?: boolean): boolean;
 
+    /**
+     * Requests Android settings be opened.
+     * @param showToastIfFailed Set to `false` to prevent a default error toast from appearing, for example when you have implemented custom error handling. Defaults to `true`.
+     * @returns `true` if the request succedeed, `false` if there was an error. You can obtain the error message by calling {@link getLastErrorMessage()}.
+     */
+    requestOpenAndroidSettings(showToastIfFailed?: boolean): boolean;
+
 
     // toast
 
@@ -649,219 +796,283 @@ export interface JSToBridgeAPI
     getDisplayShapePath(): string | null;
 }
 
-export type AppRemovedEventArgs = { packageName: string; };
-export type ValueChangeEventArgs<T> = { newValue: T; };
+// #endregion
+
+
+// #region BRIDGE TO JS (BridgeEvent)
+
+/** Utility type - create a BridgeEvent type with name N and additional properties P. */
+type E<N extends keyof BridgeEventMap, P extends object = {}> = { name: N; } & P;
+/** Utility type - create additional properties for a BridgeValueChangedEvent. */
+type V<T> = { newValue: T; };
 
 /**
- * Describes all possible combinations of `name` and `args` Bridge can call {@link onBridgeEvent()} with.
+ * Sent when Bridge receives a broadcast intent with the action `Intent.ACTION_PACKAGE_ADDED`.  
+ * Can be used to detect when an app was installed.
+ * @see [Intent.ACTION_PACKAGE_ADDED | Android Developers](https://developer.android.com/reference/android/content/Intent.html#ACTION_PACKAGE_ADDED)
  */
-export interface BridgeEventMap 
-{
-    /**
-     * Called when Bridge receives a broadcast intent with the action `Intent.ACTION_PACKAGE_ADDED`.
-     * @see [Intent.ACTION_PACKAGE_ADDED | Android Developers](https://developer.android.com/reference/android/content/Intent.html#ACTION_PACKAGE_ADDED)
-     */
-    appInstalled: BridgeInstalledAppInfo;
+export type BridgeAppInstalledEvent = E<'appInstalled', { app: BridgeInstalledAppInfo; }>;
 
-    /**
-     * Called when Bridge receives a broadcast intent with the action `Intent.ACTION_PACKAGE_CHANGED` or `Intent.ACTION_PACKAGE_REPLACED`.
-     * @see [Intent.ACTION_PACKAGE_CHANGED | Android Developers](https://developer.android.com/reference/android/content/Intent.html#ACTION_PACKAGE_CHANGED)
-     * @see [Intent.ACTION_PACKAGE_REPLACED | Android Developers](https://developer.android.com/reference/android/content/Intent.html#ACTION_PACKAGE_REPLACED)
-     */
-    appChanged: BridgeInstalledAppInfo;
+/**
+ * Sent when Bridge receives a broadcast intent with the action `Intent.ACTION_PACKAGE_REPLACED`.  
+ * Can be used to detect when an app was updated.
+ * @see [Intent.ACTION_PACKAGE_CHANGED | Android Developers](https://developer.android.com/reference/android/content/Intent.html#ACTION_PACKAGE_CHANGED)
+ * @see [Intent.ACTION_PACKAGE_REPLACED | Android Developers](https://developer.android.com/reference/android/content/Intent.html#ACTION_PACKAGE_REPLACED)
+ */
+export type BridgeAppChangedEvent = E<'appChanged', { app: BridgeInstalledAppInfo; }>;
 
-    /**
-     * Called when Bridge receives a broadcast intent with the action `Intent.ACTION_PACKAGE_REMOVED` when `Intent.EXTRA_REPLACING` is `false`.
-     * @see [Intent.ACTION_PACKAGE_REMOVED | Android Developers](https://developer.android.com/reference/android/content/Intent.html#ACTION_PACKAGE_REMOVED)
-     */
-    appRemoved: AppRemovedEventArgs;
+/**
+ * Sent when Bridge receives a broadcast intent with the action `Intent.ACTION_PACKAGE_REMOVED` when `Intent.EXTRA_REPLACING` is `false`.  
+ * Can be used to detect when an app was uninstalled.
+ * @see [Intent.ACTION_PACKAGE_REMOVED | Android Developers](https://developer.android.com/reference/android/content/Intent.html#ACTION_PACKAGE_REMOVED)
+ */
+export type BridgeAppRemovedEvent = E<'appRemoved', { packageName: string; }>;
 
 
-    /**
-     * Called in `onPause()` of the main Bridge activity. You can use this to pause any work you don't want going on in the background.
-     * @see [The activity lifecycle - onPause() | Android Developers](https://developer.android.com/guide/components/activities/activity-lifecycle#onpause)
-     */
-    beforePause: undefined;
+/**
+ * Maps an event `name` to additional properties included in the event object.
+ * @see {@link BridgeEvent} for an union of all possible event objects.
+ * @see {@link onBridgeEvent} to receive `BridgeEvent` objects.
+ */
 
-    /**
-     * Called in `onResume()` of the main Bridge activity. You can use this to resume work paused in {@link beforePause}.
-     * @see [The activity lifecycle - onResume() | Android Developers](https://developer.android.com/guide/components/activities/activity-lifecycle#onresume)
-     */
-    afterResume: undefined;
+/**
+ * Called in `onPause()` of the main Bridge activity. You can use this to pause any work you don't want going on in the background.
+ * @see [The activity lifecycle - onPause() | Android Developers](https://developer.android.com/guide/components/activities/activity-lifecycle#onpause)
+ * @see [Activity - onPause() | Android Developers](https://developer.android.com/reference/android/app/Activity#onPause())
+ */
+export type BridgeBeforePauseEvent = E<'beforePause'>;
 
+/**
+ * Called in `onNewIntent()` of the main Bridge activity. You can use this to detect when the home button has been pressed.
+ * @see [Activity - onNewIntent() | Android Developers](https://developer.android.com/reference/android/app/Activity#onNewIntent(android.content.Intent))
+ */
+export type BridgeNewIntentEvent = E<'newIntent'>;
 
-    /**
-     * Called after the Bridge button visibility setting changes, no matter what the source of the change was (Bridge settings, JS API, QS tile, ...).
-     */
-    bridgeButtonVisibilityChanged: ValueChangeEventArgs<BridgeButtonVisibility>;
-
-    /**
-     * Called after the "Draw system wallpaper behind WebView" Bridge setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
-     */
-    drawSystemWallpaperBehindWebViewChanged: ValueChangeEventArgs<boolean>;
-
-    /**
-     * Called after the "Draw overscroll effects" Bridge setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
-     */
-    overscrollEffectsChanged: ValueChangeEventArgs<OverscrollEffects>;
-
-    /**
-     * Called from `onConfigurationChanged()` of the main Bridge activity, when the system night mode changed.
-     */
-    systemNightModeChanged: ValueChangeEventArgs<SystemNightModeOrError>;
-
-    /**
-     * Called after the Bridge theme setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
-     */
-    bridgeThemeChanged: ValueChangeEventArgs<BridgeTheme>;
-
-    /**
-     * Called after the "Status bar appearance" Bridge setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
-     */
-    statusBarAppearanceChanged: ValueChangeEventArgs<SystemBarAppearance>;
-
-    /**
-     * Called after the "Navigation bar appearance" Bridge setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
-     */
-    navigationBarAppearanceChanged: ValueChangeEventArgs<SystemBarAppearance>;
-
-    /**
-     * Called after Bridge is granted/revoked permissions necessary to change the system night mode.
-     */
-    canRequestSystemNightModeChanged: ValueChangeEventArgs<boolean>;
-
-    /**
-     * Called after Bridge is granted/revoked permissions necessary to lock the screen and/or when the project is allowed/disallowed to lock the screen from the Bridge settings.
-     */
-    canLockScreenChanged: ValueChangeEventArgs<boolean>;
+/**
+ * Called in `onResume()` of the main Bridge activity. You can use this to resume work paused in {@link beforePause}.
+ * @see [The activity lifecycle - onResume() | Android Developers](https://developer.android.com/guide/components/activities/activity-lifecycle#onresume)
+ */
+export type BridgeAfterResumeEvent = E<'afterResume'>;
 
 
-    /**
-     * Called when `WindowInsets.statusBars` changed.
-     * @see [WindowInsets.Companion.statusBars | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).statusBars())
-     */
-    statusBarsWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called after the Bridge button visibility setting changes, no matter what the source of the change was (Bridge settings, JS API, QS tile, ...).
+ */
+export type BridgeBridgeButtonVisibilityChangedEvent = E<'bridgeButtonVisibilityChanged', V<BridgeButtonVisibility>>;
 
-    /**
-     * Called when `WindowInsets.statusBarsIgnoringVisibility` changed.
-     * @see [WindowInsets.Companion.statusBarsIgnoringVisibility | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).statusBarsIgnoringVisibility())
-     */
-    statusBarsIgnoringVisibilityWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called after the "Draw system wallpaper behind WebView" Bridge setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
+ */
+export type BridgeDrawSystemWallpaperBehindWebViewChangedEvent = E<'drawSystemWallpaperBehindWebViewChanged', V<boolean>>;
 
+/**
+ * Called after the "Draw overscroll effects" Bridge setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
+ */
+export type BridgeOverscrollEffectsChangedEvent = E<'overscrollEffectsChanged', V<OverscrollEffects>>;
 
-    /**
-     * Called when `WindowInsets.navigationBars` changed.
-     * @see [WindowInsets.Companion.navigationBars | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).navigationBars())
-     */
-    navigationBarsWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called from `onConfigurationChanged()` of the main Bridge activity, when the system night mode changed.
+ */
+export type BridgeSystemNightModeChangedEvent = E<'systemNightModeChanged', V<SystemNightModeOrError>>;
 
-    /**
-     * Called when `WindowInsets.navigationBarsIgnoringVisibility` changed.
-     * @see [WindowInsets.Companion.navigationBarsIgnoringVisibility | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).navigationBarsIgnoringVisibility())
-     */
-    navigationBarsIgnoringVisibilityWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called after the Bridge theme setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
+ */
+export type BridgeBridgeThemeChangedEvent = E<'bridgeThemeChanged', V<BridgeTheme>>;
 
+/**
+ * Called after the "Status bar appearance" Bridge setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
+ */
+export type BridgeStatusBarAppearanceChangedEvent = E<'statusBarAppearanceChanged', V<SystemBarAppearance>>;
 
-    /**
-     * Called when `WindowInsets.captionBar` changed.
-     * @see [WindowInsets.Companion.captionBar | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).captionBar())
-     */
-    captionBarWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called after the "Navigation bar appearance" Bridge setting changes, no matter what the source of the change was (Bridge settings, the JS API, ...).
+ */
+export type BridgeNavigationBarAppearanceChangedEvent = E<'navigationBarAppearanceChanged', V<SystemBarAppearance>>;
 
-    /**
-     * Called when `WindowInsets.captionBarIgnoringVisibility` changed.
-     * @see [WindowInsets.Companion.captionBarIgnoringVisibility | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).captionBarIgnoringVisibility())
-     */
-    captionBarIgnoringVisibilityWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called after Bridge is granted/revoked permissions necessary to change the system night mode.
+ */
+export type BridgeCanRequestSystemNightModeChangedEvent = E<'canRequestSystemNightModeChanged', V<boolean>>;
 
-
-    /**
-     * Called when `WindowInsets.systemBars` changed.
-     * @see [WindowInsets.Companion.systemBars | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).systemBars())
-     */
-    systemBarsWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
-
-    /**
-     * Called when `WindowInsets.systemBarsIgnoringVisibility` changed.
-     * @see [WindowInsets.Companion.systemBarsIgnoringVisibility | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).systemBarsIgnoringVisibility())
-     */
-    systemBarsIgnoringVisibilityWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called after Bridge is granted/revoked permissions necessary to lock the screen and/or when the project is allowed/disallowed to lock the screen from the Bridge settings.
+ */
+export type BridgeCanLockScreenChangedEvent = E<'canLockScreenChanged', V<boolean>>;
 
 
-    /**
-     * Called when `WindowInsets.ime` changed.
-     * @see [WindowInsets.Companion.ime | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).ime())
-     */
-    imeWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called when `WindowInsets.statusBars` changed.
+ * @see [WindowInsets.Companion.statusBars | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).statusBars())
+ */
+export type BridgeStatusBarsWindowInsetsChangedEvent = E<'statusBarsWindowInsetsChanged', V<WindowInsets>>;
 
-    /**
-     * Called when `WindowInsets.imeAnimationSource` changed.
-     * @see [WindowInsets.Companion.imeAnimationSource | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).imeAnimationSource())
-     */
-    imeAnimationSourceWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
-
-    /**
-     * Called when `WindowInsets.imeAnimationTarget` changed.
-     * @see [WindowInsets.Companion.imeAnimationTarget | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).imeAnimationTarget())
-     */
-    imeAnimationTargetWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called when `WindowInsets.statusBarsIgnoringVisibility` changed.
+ * @see [WindowInsets.Companion.statusBarsIgnoringVisibility | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).statusBarsIgnoringVisibility())
+ */
+export type BridgeStatusBarsIgnoringVisibilityWindowInsetsChangedEvent = E<'statusBarsIgnoringVisibilityWindowInsetsChanged', V<WindowInsets>>;
 
 
-    /**
-     * Called when `WindowInsets.tappableElement` changed.
-     * @see [WindowInsets.Companion.tappableElement | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).tappableElement())
-     */
-    tappableElementWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called when `WindowInsets.navigationBars` changed.
+ * @see [WindowInsets.Companion.navigationBars | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).navigationBars())
+ */
+export type BridgeNavigationBarsWindowInsetsChangedEvent = E<'navigationBarsWindowInsetsChanged', V<WindowInsets>>;
 
-    /**
-     * Called when `WindowInsets.tappableElementIgnoringVisibility` changed.
-     * @see [WindowInsets.Companion.tappableElementIgnoringVisibility | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).tappableElementIgnoringVisibility())
-     */
-    tappableElementIgnoringVisibilityWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
-
-
-    /**
-     * Called when `WindowInsets.systemGestures` changed.
-     * @see [WindowInsets.Companion.systemGestures | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).systemGestures())
-     */
-    systemGesturesWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
-
-    /**
-     * Called when `WindowInsets.mandatorySystemGestures` changed.
-     * @see [WindowInsets.Companion.mandatorySystemGestures | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).mandatorySystemGestures())
-     */
-    mandatorySystemGesturesWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called when `WindowInsets.navigationBarsIgnoringVisibility` changed.
+ * @see [WindowInsets.Companion.navigationBarsIgnoringVisibility | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).navigationBarsIgnoringVisibility())
+ */
+export type BridgeNavigationBarsIgnoringVisibilityWindowInsetsChangedEvent = E<'navigationBarsIgnoringVisibilityWindowInsetsChanged', V<WindowInsets>>;
 
 
-    /**
-     * Called when `WindowInsets.displayCutout` changed.
-     * @see [WindowInsets.Companion.displayCutout | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).displayCutout())
-     */
-    displayCutoutWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called when `WindowInsets.captionBar` changed.
+ * @see [WindowInsets.Companion.captionBar | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).captionBar())
+ */
+export type BridgeCaptionBarWindowInsetsChangedEvent = E<'captionBarWindowInsetsChanged', V<WindowInsets>>;
 
-    /**
-     * Called when `WindowInsets.waterfall` changed.
-     * @see [WindowInsets.Companion.waterfall | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).waterfall())
-     */
-    waterfallWindowInsetsChanged: ValueChangeEventArgs<WindowInsets>;
+/**
+ * Called when `WindowInsets.captionBarIgnoringVisibility` changed.
+ * @see [WindowInsets.Companion.captionBarIgnoringVisibility | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).captionBarIgnoringVisibility())
+ */
+export type BridgeCaptionBarIgnoringVisibilityWindowInsetsChangedEvent = E<'captionBarIgnoringVisibilityWindowInsetsChanged', V<WindowInsets>>;
+
+
+/**
+ * Called when `WindowInsets.systemBars` changed.
+ * @see [WindowInsets.Companion.systemBars | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).systemBars())
+ */
+export type BridgeSystemBarsWindowInsetsChangedEvent = E<'systemBarsWindowInsetsChanged', V<WindowInsets>>;
+
+/**
+ * Called when `WindowInsets.systemBarsIgnoringVisibility` changed.
+ * @see [WindowInsets.Companion.systemBarsIgnoringVisibility | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).systemBarsIgnoringVisibility())
+ */
+export type BridgeSystemBarsIgnoringVisibilityWindowInsetsChangedEvent = E<'systemBarsIgnoringVisibilityWindowInsetsChanged', V<WindowInsets>>;
+
+
+/**
+ * Called when `WindowInsets.ime` changed.
+ * @see [WindowInsets.Companion.ime | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).ime())
+ */
+export type BridgeImeWindowInsetsChangedEvent = E<'imeWindowInsetsChanged', V<WindowInsets>>;
+
+/**
+ * Called when `WindowInsets.imeAnimationSource` changed.
+ * @see [WindowInsets.Companion.imeAnimationSource | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).imeAnimationSource())
+ */
+export type BridgeImeAnimationSourceWindowInsetsChangedEvent = E<'imeAnimationSourceWindowInsetsChanged', V<WindowInsets>>;
+
+/**
+ * Called when `WindowInsets.imeAnimationTarget` changed.
+ * @see [WindowInsets.Companion.imeAnimationTarget | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).imeAnimationTarget())
+ */
+export type BridgeImeAnimationTargetWindowInsetsChangedEvent = E<'imeAnimationTargetWindowInsetsChanged', V<WindowInsets>>;
+
+
+/**
+ * Called when `WindowInsets.tappableElement` changed.
+ * @see [WindowInsets.Companion.tappableElement | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).tappableElement())
+ */
+export type BridgeTappableElementWindowInsetsChangedEvent = E<'tappableElementWindowInsetsChanged', V<WindowInsets>>;
+
+/**
+ * Called when `WindowInsets.tappableElementIgnoringVisibility` changed.
+ * @see [WindowInsets.Companion.tappableElementIgnoringVisibility | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).tappableElementIgnoringVisibility())
+ */
+export type BridgeTappableElementIgnoringVisibilityWindowInsetsChangedEvent = E<'tappableElementIgnoringVisibilityWindowInsetsChanged', V<WindowInsets>>;
+
+
+/**
+ * Called when `WindowInsets.systemGestures` changed.
+ * @see [WindowInsets.Companion.systemGestures | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).systemGestures())
+ */
+export type BridgeSystemGesturesWindowInsetsChangedEvent = E<'systemGesturesWindowInsetsChanged', V<WindowInsets>>;
+
+/**
+ * Called when `WindowInsets.mandatorySystemGestures` changed.
+ * @see [WindowInsets.Companion.mandatorySystemGestures | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).mandatorySystemGestures())
+ */
+export type BridgeMandatorySystemGesturesWindowInsetsChangedEvent = E<'mandatorySystemGesturesWindowInsetsChanged', V<WindowInsets>>;
+
+
+/**
+ * Called when `WindowInsets.displayCutout` changed.
+ * @see [WindowInsets.Companion.displayCutout | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).displayCutout())
+ */
+export type BridgeDisplayCutoutWindowInsetsChangedEvent = E<'displayCutoutWindowInsetsChanged', V<WindowInsets>>;
+
+/**
+ * Called when `WindowInsets.waterfall` changed.
+ * @see [WindowInsets.Companion.waterfall | Android Developers](https://developer.android.com/reference/kotlin/androidx/compose/foundation/layout/WindowInsets.Companion#(androidx.compose.foundation.layout.WindowInsets.Companion).waterfall())
+ */
+export type BridgeWaterfallWindowInsetsChangedEvent = E<'waterfallWindowInsetsChanged', V<WindowInsets>>;
+
+/**
+ * Convenience type - maps BridgeEvent names to BridgeEvent types.
+ */
+export type BridgeEventMap = {
+    appInstalled: BridgeAppInstalledEvent;
+    appChanged: BridgeAppChangedEvent;
+    appRemoved: BridgeAppRemovedEvent;
+    beforePause: BridgeBeforePauseEvent;
+    newIntent: BridgeNewIntentEvent;
+    afterResume: BridgeAfterResumeEvent;
+    bridgeButtonVisibilityChanged: BridgeBridgeButtonVisibilityChangedEvent;
+    drawSystemWallpaperBehindWebViewChanged: BridgeDrawSystemWallpaperBehindWebViewChangedEvent;
+    overscrollEffectsChanged: BridgeOverscrollEffectsChangedEvent;
+    systemNightModeChanged: BridgeSystemNightModeChangedEvent;
+    bridgeThemeChanged: BridgeBridgeThemeChangedEvent;
+    statusBarAppearanceChanged: BridgeStatusBarAppearanceChangedEvent;
+    navigationBarAppearanceChanged: BridgeNavigationBarAppearanceChangedEvent;
+    canRequestSystemNightModeChanged: BridgeCanRequestSystemNightModeChangedEvent;
+    canLockScreenChanged: BridgeCanLockScreenChangedEvent;
+    statusBarsWindowInsetsChanged: BridgeStatusBarsWindowInsetsChangedEvent;
+    statusBarsIgnoringVisibilityWindowInsetsChanged: BridgeStatusBarsIgnoringVisibilityWindowInsetsChangedEvent;
+    navigationBarsWindowInsetsChanged: BridgeNavigationBarsWindowInsetsChangedEvent;
+    navigationBarsIgnoringVisibilityWindowInsetsChanged: BridgeNavigationBarsIgnoringVisibilityWindowInsetsChangedEvent;
+    captionBarWindowInsetsChanged: BridgeCaptionBarWindowInsetsChangedEvent;
+    captionBarIgnoringVisibilityWindowInsetsChanged: BridgeCaptionBarIgnoringVisibilityWindowInsetsChangedEvent;
+    systemBarsWindowInsetsChanged: BridgeSystemBarsWindowInsetsChangedEvent;
+    systemBarsIgnoringVisibilityWindowInsetsChanged: BridgeSystemBarsIgnoringVisibilityWindowInsetsChangedEvent;
+    imeWindowInsetsChanged: BridgeImeWindowInsetsChangedEvent;
+    imeAnimationSourceWindowInsetsChanged: BridgeImeAnimationSourceWindowInsetsChangedEvent;
+    imeAnimationTargetWindowInsetsChanged: BridgeImeAnimationTargetWindowInsetsChangedEvent;
+    tappableElementWindowInsetsChanged: BridgeTappableElementWindowInsetsChangedEvent;
+    tappableElementIgnoringVisibilityWindowInsetsChanged: BridgeTappableElementIgnoringVisibilityWindowInsetsChangedEvent;
+    systemGesturesWindowInsetsChanged: BridgeSystemGesturesWindowInsetsChangedEvent;
+    mandatorySystemGesturesWindowInsetsChanged: BridgeMandatorySystemGesturesWindowInsetsChangedEvent;
+    displayCutoutWindowInsetsChanged: BridgeDisplayCutoutWindowInsetsChangedEvent;
+    waterfallWindowInsetsChanged: BridgeWaterfallWindowInsetsChangedEvent;
 }
 
-/**
- * Describes all possible names Bridge can call {@link onBridgeEvent()} with.
+/** Any valid {@link BridgeEvent} name. */
+export type BridgeEventName = BridgeEventMap[keyof BridgeEventMap]['name'];
+
+/** 
+ * A union of all possible `BridgeEvent` types.
+ * @see {@link onBridgeEvent} to receive `BridgeEvent` objects.
+ * @example 
+ * // accepts any `BridgeEvent`
+ * function onBridgeEvent(event: BridgeEvent) { ... }
+ * // only accepts the appInstalled event
+ * function onAppInstalledEvent(event: BridgeEvent['appInstalled']) { ... }
  */
-export type BridgeEventName = keyof BridgeEventMap;
+export type BridgeEvent = BridgeEventMap[keyof BridgeEventMap];
 
 /**
- * An union of tuples describing all possible combinations of `name` and `args` Bridge can call {@link onBridgeEvent()} with.
+ * Describes a function that accepts `BridgeEvent` objects.
+ * @see {@link BridgeEvent} for a union of all possible `BridgeEvent` objects.
+ * @see {@link onBridgeEvent} for how to receive `BridgeEvent` objects and set up multiple listeners.
  */
-export type BridgeEventListenerArgs = {
-    [K in BridgeEventName]: [name: K, args: BridgeEventMap[K]]
-}[BridgeEventName];
+export type BridgeEventListener = (event: BridgeEvent) => void;
 
-/**
- * Describes a valid function that can be assigned to {@link onBridgeEvent} to be called by Bridge when an event occurs.
- */
-export type BridgeEventListener = (...args: BridgeEventListenerArgs) => void;
+// #endregion
+
+
+// #region GLOBAL
 
 declare global
 {
@@ -872,19 +1083,23 @@ declare global
     var Bridge: JSToBridgeAPI;
 
     /**
-     * Assign a function to this variable to listen to Bridge events. Bridge will call this function if it is set.
-     * @see {@link BridgeEventMap} for event names and corresponding arguments.
+     * Called by Bridge when an event occurs.
+     * @see {@link BridgeEvent} for a union of all possible `BridgeEvent` objects.
      * @see {@link Bridge} for calling the Bridge JS API.
-     * @example
-     * const listeners = new Set<BridgeEventListener>();
-     * window.onBridgeEvent = (...event: BridgeEventListenerArgs) => listeners.forEach(l => l(...event));
-     * // somewhere else
-     * listeners.add((...[name, args]: BridgeEventListenerArgs) => {
-     *      if(name === 'appInstalled') {
-     *          // args will be strongly typed here
-     *          console.log(args.packageName)
+     * @example 
+     * // simple broadcaster (simple way to have more than one event listener)
+     * const bridgeEventListeners = new Set<BridgeEventListener>();
+     * window.onBridgeEvent = event => listeners.forEach(l => l(event));
+     * 
+     * // subscribe to events
+     * bridgeEventListeners.add(event => {
+     *      if (event.name === 'appInstalled') {
+     *          // event will be narrowed to the appropriate type for autocompletion
+     *          console.log(ev.app.packageName)
      *      }
      * })
      */
     var onBridgeEvent: BridgeEventListener | undefined;
 }
+
+// #endregion
